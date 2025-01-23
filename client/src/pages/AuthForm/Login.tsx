@@ -1,28 +1,47 @@
 import React, { useState } from 'react';
-import api from '../../api/api';
 import { Navigate } from 'react-router-dom';
+import supabase from '../../api/supabaseClient'; // Adjust the import path
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState('');
   const [redirect, setRedirect] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await api.post('/api/auth/login', formData);
-      setMessage(response.data.message);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+      console.log('Supabase Response:', data); // Log the response
+      console.log('Supabase Error:', error); // Log any errors
+  
+
+      if (error) {
+        throw error;
+      }
+
+      // Check the user's role (assuming it's stored in user_metadata)
+      const role = data.user?.user_metadata?.role || 'user';
+      setUserRole(role);
       setRedirect(true);
     } catch (error: any) {
-      setMessage(error.response?.data?.error || 'Login failed');
+      setMessage(error.message || 'Login failed');
     }
   };
+
   if (redirect) {
-    return <Navigate to="/dashboard" />;
+    if (userRole === 'admin') {
+      return <Navigate to="/admin-dashboard" />;
+    } else {
+      return <Navigate to="/dashboard" />;
+    }
   }
 
   return (

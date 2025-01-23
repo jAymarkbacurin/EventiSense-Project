@@ -68,9 +68,12 @@ const loginUser = async (req, res) => {
     if (error) {
       return res.status(400).json({ error: error.message });
     }
+    const userRole = data.user.user_metadata?.role; // e.g., 'admin', 'regular user'
+    console.log('User role:', userRole);
 
     // Return success response
-    res.status(200).json({ message: 'User logged in successfully', data });
+    return { user: data.user, role: userRole, message: 'User logged in successfully' };
+
   } catch (err) {
     console.error('Error during login:', err);
     res.status(500).json({ error: 'Internal server error' });

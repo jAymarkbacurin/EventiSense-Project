@@ -1,9 +1,14 @@
-const App = () => {
-  return (
-    <div className="bg-blue-100 text-white text-center  p-4">
-      <h1 className="text-2xl font-bold">Hello, Tailwind CSS with React!</h1>
-    </div>
-  );
-};
+import {BrowserRouter as Router } from "react-router-dom"
+import PageRoutes from "./routers/Approuter"
+import "./styles/global.css"
 
-export default App;
+function App() {
+
+  return (
+    <Router>
+      <PageRoutes/>
+    </Router>
+  )
+}
+
+export default App
